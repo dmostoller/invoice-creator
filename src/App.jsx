@@ -21,17 +21,42 @@ function App() {
 
   const downloadPdf = () => {
     const invoiceElement = document.getElementById("invoice-preview");
+
+    // Calculate the dimensions of A4 in pixels at 96 DPI
+    const pixelsPerMM = 3.2; // 1 mm = 3.7795 pixels at 96 DPI
+    const pdfWidthPx = Math.floor(210 * pixelsPerMM); // A4 width: 210mm
+    const pdfHeightPx = Math.floor(297 * pixelsPerMM); // A4 height: 297mm
+
     html2canvas(invoiceElement, {
-      scale: 2, // Increase the scaling for better quality
+      // Set the width and height to match A4 dimensions
+      width: pdfWidthPx,
+      height: pdfHeightPx, // Use the actual height of the invoice
+      // Use a higher scale for better quality
+      scale: 3,
+      // Allow cross-origin images
       useCORS: true,
-      windowWidth: invoiceElement.scrollWidth, // Use full width of the invoice element
-      windowHeight: invoiceElement.scrollHeight, // Use full height of the invoice element
     }).then((canvas) => {
       const imgData = canvas.toDataURL("image/png");
+
+      // Create PDF
       const pdf = new jsPDF("p", "mm", "a4");
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Adjust the image size to fully fit the PDF dimensions (taking the height into account)
+      const imgWidth = pdfWidth;
+      const imgHeight = canvas.height * (pdfWidth / canvas.width);
+
+      // If the image height is larger than the PDF, we need to scale it down proportionally
+      if (imgHeight > pdfHeight) {
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      } else {
+        // Add the image to the PDF with appropriate dimensions
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      }
+
+      // Save the PDF
       pdf.save("invoice.pdf");
     });
   };

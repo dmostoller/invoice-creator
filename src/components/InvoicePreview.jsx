@@ -7,6 +7,17 @@ function InvoicePreview({ invoiceData }) {
   const tableThemeColor = invoiceData.tableThemeColor || "#D1D1D1";
   const textThemeColor = invoiceData.textThemeColor || "#000000";
 
+  function formatPhoneNumber(phoneNumber) {
+    const cleaned = ("" + phoneNumber).replace(/\D/g, "");
+    if (cleaned.length !== 10) {
+      return phoneNumber;
+    }
+    const part1 = cleaned.slice(0, 3);
+    const part2 = cleaned.slice(3, 6);
+    const part3 = cleaned.slice(6, 10);
+    return `(${part1}) ${part2} - ${part3}`;
+  }
+
   return (
     <div
       id="invoice-preview"
@@ -21,15 +32,29 @@ function InvoicePreview({ invoiceData }) {
         <img
           src={invoiceData.logo}
           alt="Logo"
-          className="absolute top-4 right-4 w-24 h-24 object-contain rounded-full"
+          className="absolute top-6 right-6 w-24 h-24 object-contain rounded-full"
         />
       )}
+
       <h2 className="text-4xl font-bold mb-8" style={{ color: themeColor }}>
         INVOICE
       </h2>
-      <p className="text-lg">Invoice #: {invoiceData.invoiceNumber || 1001}</p>
-      <p className="text-lg mb-8">Date: {invoiceData.invoiceDate}</p>
-      <div className="flex justify-between mb-2">
+      <div className="grid grid-cols-2 gap-4 mt-16">
+        <div>
+          <p className="text-lg">
+            Invoice #: {invoiceData.invoiceNumber || 1001}
+          </p>
+          <p className="text-lg mb-8">Date: {invoiceData.invoiceDate}</p>
+        </div>
+        <div className="text-right">
+          <p>
+            {formatPhoneNumber(invoiceData.phone)}
+            <br /> {invoiceData.email} <br />
+            {invoiceData.website}
+          </p>
+        </div>
+      </div>
+      <div className="flex justify-between mb-2 mt-8">
         <div>
           <h3 className="text-xl font-bold">Bill to:</h3>
           <p className="font-semibold">{invoiceData.clientName}</p>
@@ -50,10 +75,10 @@ function InvoicePreview({ invoiceData }) {
           className="grid grid-cols-[50px_2fr_1fr_1fr_1fr] gap-4 font-bold p-2 border-b"
           style={{ borderColor: themeColor, color: themeColor }}
         >
-          <p>No</p>
-          <p>Items</p>
-          <p>QTY</p>
-          <p>Price</p>
+          <p>#</p>
+          <p>Item</p>
+          <p>Hours</p>
+          <p>Rate</p>
           <p className="text-right">Total</p>
         </div>
         {invoiceData.items.map((item, index) => (
@@ -91,11 +116,11 @@ function InvoicePreview({ invoiceData }) {
         <h3 className="text-lg font-semibold mb-2">Payment information:</h3>
         <p>Bank: {invoiceData.bankName}</p>
         <p>Name: {invoiceData.payableName}</p>
-        <p>Routing: {invoiceData.routingNumber}</p>
-        <p>Account: {invoiceData.accountNumber}</p>
+        <p>Routing #: {invoiceData.routingNumber}</p>
+        <p>Account #: {invoiceData.accountNumber}</p>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-16">
         <h3 className="text-lg font-semibold mb-2">Terms & Conditions:</h3>
         <p>
           {invoiceData.terms ||

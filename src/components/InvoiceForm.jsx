@@ -1,55 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
-import Papa from "papaparse";
+import ItemInput from "./ItemInput";
 
 const inputStyle =
   "w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-black dark:text-white";
-
-function ItemInput({ item, index, handleItemChange, deleteItem }) {
-  return (
-    <div key={index} className="mb-2">
-      <label className="block">Item Description</label>
-      <input
-        type="text"
-        name="description"
-        value={item.description}
-        onChange={(e) => handleItemChange(index, e)}
-        className={inputStyle}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div>
-          <label className="block">Quantity</label>
-          <input
-            type="number"
-            name="quantity"
-            value={item.quantity}
-            onChange={(e) => handleItemChange(index, e)}
-            className={inputStyle}
-          />
-        </div>
-        <div>
-          <label className="block">Price</label>
-          <input
-            type="number"
-            name="price"
-            value={item.price}
-            onChange={(e) => handleItemChange(index, e)}
-            className={inputStyle}
-          />
-        </div>
-      </div>
-      <div className="flex justify-between">
-        <button
-          type="button"
-          onClick={() => deleteItem(index)}
-          className="bg-gray-300 dark:bg-gray-900 text-black dark:text-white text-xs p-1 rounded mt-2 font-bold hover:bg-gray-400 dark:hover:bg-gray-600 hover:scale-105 transform transition"
-        >
-          Delete Item
-        </button>
-      </div>
-    </div>
-  );
-}
 
 function InvoiceForm({ invoiceData, setInvoiceData }) {
   const [accountNumber, setAccountNumber] = useState("");
@@ -122,34 +76,6 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
     } else {
       setAccountNumberError("");
       setInvoiceData({ ...invoiceData, accountNumber });
-    }
-  };
-
-  // Updated function to handle timesheet upload
-  const handleTimesheetUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          const parsedData = results.data;
-          console.log("Parsed timesheet data:", parsedData);
-          // Map the parsed data to invoice items
-          const newItems = parsedData.map((entry) => ({
-            description: entry["Project"] ? entry["Project"].trim() : "",
-            quantity: parseFloat(entry["Duration"]) || 1,
-            price: 50,
-          }));
-          setInvoiceData({
-            ...invoiceData,
-            items: [...invoiceData.items, ...newItems],
-          });
-        },
-        error: (error) => {
-          console.error("Error parsing timesheet file:", error);
-        },
-      });
     }
   };
 
@@ -345,13 +271,6 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
         />
         <div className="flex items-center justify-between mt-2 mb-2">
           <h3 className="text-xl font-semibold">Items</h3>
-          {/* <label className="block">Import Timesheet</label>
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleTimesheetUpload}
-            className={`${inputStyle} w-64`}
-          /> */}
           <button
             type="button"
             onClick={addItem}
@@ -371,12 +290,42 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
             />
           ))}
         </div>
-        <h3 className="text-xl font-semibold mt-8">Terms & Conditions</h3>
+        <h3 className="text-xl font-semibold mt-2">Terms & Conditions</h3>
         <textarea
           name="terms"
           value={invoiceData.terms}
           onChange={handleChange}
           className={`${inputStyle} w-full h-16 mb-4`}
+        />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div>
+            <label className="block">Email</label>
+            <input
+              type="text"
+              name="email"
+              value={invoiceData.email}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+          </div>
+          <div>
+            <label className="block">Phone Number</label>
+            <input
+              type="text"
+              name="phone"
+              value={invoiceData.phone}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+          </div>
+        </div>
+        <label className="block">Website</label>
+        <input
+          type="text"
+          name="website"
+          value={invoiceData.website}
+          onChange={handleChange}
+          className={inputStyle}
         />
       </form>
     </div>
