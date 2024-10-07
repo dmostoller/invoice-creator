@@ -1,5 +1,55 @@
 import React, { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
+import Papa from "papaparse";
+
+const inputStyle =
+  "w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-black dark:text-white";
+
+function ItemInput({ item, index, handleItemChange, deleteItem }) {
+  return (
+    <div key={index} className="mb-2">
+      <label className="block">Item Description</label>
+      <input
+        type="text"
+        name="description"
+        value={item.description}
+        onChange={(e) => handleItemChange(index, e)}
+        className={inputStyle}
+      />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div>
+          <label className="block">Quantity</label>
+          <input
+            type="number"
+            name="quantity"
+            value={item.quantity}
+            onChange={(e) => handleItemChange(index, e)}
+            className={inputStyle}
+          />
+        </div>
+        <div>
+          <label className="block">Price</label>
+          <input
+            type="number"
+            name="price"
+            value={item.price}
+            onChange={(e) => handleItemChange(index, e)}
+            className={inputStyle}
+          />
+        </div>
+      </div>
+      <div className="flex justify-between">
+        <button
+          type="button"
+          onClick={() => deleteItem(index)}
+          className="bg-gray-300 dark:bg-black text-black dark:text-white text-xs p-1 rounded mt-2 font-bold hover:bg-gray-400 dark:hover:bg-gray-900 hover:scale-105 transform transition"
+        >
+          Delete Item
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function InvoiceForm({ invoiceData, setInvoiceData }) {
   const [accountNumber, setAccountNumber] = useState("");
@@ -19,7 +69,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
         invoiceDate: getTodayDate(),
       }));
     }
-  }, [invoiceData, setInvoiceData]);
+  }, [invoiceData.invoiceDate, setInvoiceData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,12 +106,14 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
       reader.readAsDataURL(file);
     }
   };
-  const handleAccountNumberChange = (e) => {
-    setAccountNumber(e.target.value);
-  };
 
-  const handleConfirmAccountNumberChange = (e) => {
-    setConfirmAccountNumber(e.target.value);
+  const handleAccountNumberChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "accountNumber") {
+      setAccountNumber(value);
+    } else if (name === "confirmAccountNumber") {
+      setConfirmAccountNumber(value);
+    }
   };
 
   const validateAccountNumbers = () => {
@@ -72,28 +124,37 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
       setInvoiceData({ ...invoiceData, accountNumber });
     }
   };
-  const handleTableThemeChange = (e) => {
-    setInvoiceData({ ...invoiceData, tableThemeColor: e.target.value });
-  };
 
-  const handleThemeChange = (e) => {
-    setInvoiceData({ ...invoiceData, themeColor: e.target.value });
-  };
-
-  const handleFontChange = (e) => {
-    setInvoiceData({ ...invoiceData, font: e.target.value });
-  };
-
-  const handleBackgroundChange = (e) => {
-    setInvoiceData({ ...invoiceData, backgroundColor: e.target.value });
-  };
-
-  const handleTextThemeChange = (e) => {
-    setInvoiceData({ ...invoiceData, textThemeColor: e.target.value });
+  // Updated function to handle timesheet upload
+  const handleTimesheetUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const parsedData = results.data;
+          console.log("Parsed timesheet data:", parsedData);
+          // Map the parsed data to invoice items
+          const newItems = parsedData.map((entry) => ({
+            description: entry["Project"] ? entry["Project"].trim() : "",
+            quantity: parseFloat(entry["Duration"]) || 1,
+            price: 50,
+          }));
+          setInvoiceData({
+            ...invoiceData,
+            items: [...invoiceData.items, ...newItems],
+          });
+        },
+        error: (error) => {
+          console.error("Error parsing timesheet file:", error);
+        },
+      });
+    }
   };
 
   return (
-    <div className="bg-gray-600 p-6 rounded-md shadow-md w-full lg:w-1/2">
+    <div className="bg-gray-200 dark:bg-gray-700 p-6 rounded-md shadow-md w-full lg:w-1/2">
       <div className="grid grid-cols-5">
         <div>
           <h3 className="text-xl font-semibold mb-4">BgColor</h3>
@@ -101,7 +162,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
             type="color"
             name="backgroundColor"
             value={invoiceData.backgroundColor || "#E0E0E0"}
-            onChange={handleBackgroundChange}
+            onChange={handleChange}
             className="bg-transparent"
           />
         </div>
@@ -111,7 +172,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
             type="color"
             name="themeColor"
             value={invoiceData.themeColor || "#1A7DFF"}
-            onChange={handleThemeChange}
+            onChange={handleChange}
             className="bg-transparent"
           />
         </div>
@@ -121,29 +182,27 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
             type="color"
             name="tableThemeColor"
             value={invoiceData.tableThemeColor || "#D1D1D1"}
-            onChange={handleTableThemeChange}
+            onChange={handleChange}
             className="bg-transparent"
           />
         </div>
         <div>
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Color 3</h3>
-            <input
-              type="color"
-              name="textThemeColor"
-              value={invoiceData.textThemeColor || "#000000"}
-              onChange={handleTextThemeChange}
-              className="bg-transparent"
-            />
-          </div>
+          <h3 className="text-xl font-semibold mb-4">Color 3</h3>
+          <input
+            type="color"
+            name="textThemeColor"
+            value={invoiceData.textThemeColor || "#000000"}
+            onChange={handleChange}
+            className="bg-transparent"
+          />
         </div>
         <div>
           <h3 className="text-xl font-semibold mb-4">Font Style</h3>
           <select
             name="font"
             value={invoiceData.font || "sans-serif"}
-            onChange={handleFontChange}
-            className="w-full p-2 mb-4 border rounded"
+            onChange={handleChange}
+            className={`${inputStyle} w-full mb-4 p-2`}
           >
             <option value="sans-serif">Sans-serif (Default)</option>
             <option value="Arial, sans-serif">Arial</option>
@@ -170,8 +229,8 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
               name="invoiceNumber"
               value={invoiceData.invoiceNumber || 1001}
               onChange={handleChange}
-              className="w-full p-2 mb-4 border rounded"
-            />{" "}
+              className={inputStyle}
+            />
           </div>
           <div>
             <label className="block mb-2">Invoice Date</label>
@@ -180,42 +239,54 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
               name="invoiceDate"
               value={invoiceData.invoiceDate}
               onChange={handleChange}
-              className="w-full p-2 mb-4 border rounded"
+              className={inputStyle}
             />
           </div>
         </div>
-        <label className="block">Client Name</label>
-        <input
-          type="text"
-          name="clientName"
-          value={invoiceData.clientName}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-        />
-        <label className="block">Client Address</label>
-        <input
-          type="text"
-          name="clientAddress"
-          value={invoiceData.clientAddress}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-        />
-        <label className="block">Payable Name</label>
-        <input
-          type="text"
-          name="payableName"
-          value={invoiceData.payableName}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-        />
-        <label className="block">Payable Address</label>
-        <input
-          type="text"
-          name="payableAddress"
-          value={invoiceData.payableAddress}
-          onChange={handleChange}
-          className="w-full p-2 mb-2 border rounded"
-        />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div>
+            <label className="block">Client Name</label>
+            <input
+              type="text"
+              name="clientName"
+              value={invoiceData.clientName}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+          </div>
+          <div>
+            <label className="block">Client Address</label>
+            <input
+              type="text"
+              name="clientAddress"
+              value={invoiceData.clientAddress}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div>
+            <label className="block">Payable Name</label>
+            <input
+              type="text"
+              name="payableName"
+              value={invoiceData.payableName}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+          </div>
+          <div>
+            <label className="block">Payable Address</label>
+            <input
+              type="text"
+              name="payableAddress"
+              value={invoiceData.payableAddress}
+              onChange={handleChange}
+              className={inputStyle}
+            />
+          </div>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div>
             <label className="block">Bank Name</label>
@@ -224,7 +295,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
               name="bankName"
               value={invoiceData.bankName}
               onChange={handleChange}
-              className="w-full p-2 mb-2 border rounded"
+              className={inputStyle}
             />
           </div>
           <div>
@@ -234,7 +305,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
               name="routingNumber"
               value={invoiceData.routingNumber}
               onChange={handleChange}
-              className="w-full p-2 mb-2 border rounded"
+              className={inputStyle}
             />
           </div>
         </div>
@@ -243,20 +314,22 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
             <label className="block">Account Number</label>
             <input
               type="text"
+              name="accountNumber"
               value={accountNumber}
               onChange={handleAccountNumberChange}
               onBlur={validateAccountNumbers}
-              className="w-full p-2 mb-4 border rounded"
+              className={inputStyle}
             />
           </div>
           <div>
             <label className="block">Confirm Account Number</label>
             <input
               type="text"
+              name="confirmAccountNumber"
               value={confirmAccountNumber}
-              onChange={handleConfirmAccountNumberChange}
+              onChange={handleAccountNumberChange}
               onBlur={validateAccountNumbers}
-              className="w-full p-2 mb-4 border rounded"
+              className={inputStyle}
             />
           </div>
         </div>
@@ -268,56 +341,34 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
           type="file"
           accept="image/*"
           onChange={handleLogoUpload}
-          className="w-full p-2 mb-4 border rounded"
+          className={inputStyle}
         />
         <div className="flex items-center justify-between mt-2 mb-2">
           <h3 className="text-xl font-semibold">Items</h3>
+          {/* <label className="block">Import Timesheet</label>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleTimesheetUpload}
+            className={`${inputStyle} w-64`}
+          /> */}
           <button
             type="button"
             onClick={addItem}
-            className="bg-black text-white p-2 rounded-full hover:bg-gray-800 hover:scale-110 transform transition"
+            className="bg-gray-300 dark:bg-black text-black dark:text-white rounded-full mt-2 p-2 hover:bg-gray-400 dark:hover:bg-gray-900 hover:scale-110 transform transition"
           >
             <FaPlus />
           </button>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {invoiceData.items.map((item, index) => (
-            <div key={index} className="mb-2">
-              <label className="block">Item Description</label>
-              <input
-                type="text"
-                name="description"
-                value={item.description}
-                onChange={(e) => handleItemChange(index, e)}
-                className="w-full p-2 border rounded"
-              />
-              <label className="block">Quantity</label>
-              <input
-                type="number"
-                name="quantity"
-                value={item.quantity}
-                onChange={(e) => handleItemChange(index, e)}
-                className="w-full p-2 border rounded"
-              />
-              <label className="block">Price</label>
-              <input
-                type="number"
-                name="price"
-                value={item.price}
-                onChange={(e) => handleItemChange(index, e)}
-                className="w-full p-2 border rounded"
-              />
-
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={() => deleteItem(index)}
-                  className="ml-auto bg-black text-white p-1 text-xs font-bold rounded mt-2 hover:bg-gray-800 hover:scale-110 transform transition"
-                >
-                  Delete Item
-                </button>
-              </div>
-            </div>
+            <ItemInput
+              key={index}
+              item={item}
+              index={index}
+              handleItemChange={handleItemChange}
+              deleteItem={deleteItem}
+            />
           ))}
         </div>
         <h3 className="text-xl font-semibold mt-8">Terms & Conditions</h3>
@@ -325,7 +376,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
           name="terms"
           value={invoiceData.terms}
           onChange={handleChange}
-          className="w-full p-2 mb-4 border rounded h-32"
+          className={`${inputStyle} w-full h-16 mb-4`}
         />
       </form>
     </div>
