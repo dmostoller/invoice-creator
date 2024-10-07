@@ -42,7 +42,7 @@ function ItemInput({ item, index, handleItemChange, deleteItem }) {
         <button
           type="button"
           onClick={() => deleteItem(index)}
-          className="bg-gray-300 dark:bg-black text-black dark:text-white text-xs p-1 rounded mt-2 font-bold hover:bg-gray-400 dark:hover:bg-gray-900 hover:scale-105 transform transition"
+          className="bg-gray-300 dark:bg-gray-900 text-black dark:text-white text-xs p-1 rounded mt-2 font-bold hover:bg-gray-400 dark:hover:bg-gray-600 hover:scale-105 transform transition"
         >
           Delete Item
         </button>
@@ -355,7 +355,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
           <button
             type="button"
             onClick={addItem}
-            className="bg-gray-300 dark:bg-black text-black dark:text-white rounded-full mt-2 p-2 hover:bg-gray-400 dark:hover:bg-gray-900 hover:scale-110 transform transition"
+            className="bg-gray-300 dark:bg-gray-900 text-black dark:text-white rounded-full mt-2 p-2 hover:bg-gray-400 dark:hover:bg-gray-600 hover:scale-110 transform transition"
           >
             <FaPlus />
           </button>

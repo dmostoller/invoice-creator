@@ -61,7 +61,7 @@ function App() {
         <button
           type="button"
           onClick={downloadPdf}
-          className="bg-gray-300 dark:bg-black text-black dark:text-white p-3 rounded w-96 font-bold hover:bg-gray-400 dark:hover:bg-gray-700 hover:scale-105 transform transition"
+          className="bg-gray-300 dark:bg-gray-500 text-black dark:text-white p-3 rounded w-96 font-bold hover:bg-gray-400 dark:hover:bg-gray-600 hover:scale-105 transform transition"
         >
           Download PDF
         </button>
