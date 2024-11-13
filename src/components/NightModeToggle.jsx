@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { FaSun, FaMoon } from "react-icons/fa";
+import { useState, useEffect } from 'react';
+import { FaSun, FaMoon } from 'react-icons/fa';
+import PropTypes from 'prop-types';
 
 const NightModeToggle = ({ onToggle }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
+  NightModeToggle.propTypes = {
+    onToggle: PropTypes.func.isRequired,
+  };
   useEffect(() => {
     const darkModeMediaQuery = window.matchMedia(
-      "(prefers-color-scheme: dark)"
+      '(prefers-color-scheme: dark)'
     );
     setIsDarkMode(darkModeMediaQuery.matches);
-    darkModeMediaQuery.addEventListener("change", (e) => {
+    darkModeMediaQuery.addEventListener('change', (e) => {
       setIsDarkMode(e.matches);
       onToggle(e.matches);
     });
     return () =>
-      darkModeMediaQuery.removeEventListener("change", (e) => {
+      darkModeMediaQuery.removeEventListener('change', (e) => {
         setIsDarkMode(e.matches);
         onToggle(e.matches);
       });

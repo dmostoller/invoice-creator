@@ -1,14 +1,45 @@
-import React from "react";
+import PropTypes from 'prop-types';
 
 function InvoicePreview({ invoiceData }) {
-  const themeColor = invoiceData.themeColor || "#1A7DFF";
-  const fontFamily = invoiceData.font || "sans-serif";
-  const backgroundColor = invoiceData.backgroundColor || "#E0E0E0";
-  const tableThemeColor = invoiceData.tableThemeColor || "#D1D1D1";
-  const textThemeColor = invoiceData.textThemeColor || "#000000";
+  const themeColor = invoiceData.themeColor || '#1A7DFF';
+  const fontFamily = invoiceData.font || 'sans-serif';
+  const backgroundColor = invoiceData.backgroundColor || '#E0E0E0';
+  const tableThemeColor = invoiceData.tableThemeColor || '#D1D1D1';
+  const textThemeColor = invoiceData.textThemeColor || '#000000';
+
+  InvoicePreview.propTypes = {
+    invoiceData: PropTypes.shape({
+      themeColor: PropTypes.string,
+      font: PropTypes.string,
+      backgroundColor: PropTypes.string,
+      tableThemeColor: PropTypes.string,
+      textThemeColor: PropTypes.string,
+      logo: PropTypes.string,
+      invoiceNumber: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      invoiceDate: PropTypes.string,
+      phone: PropTypes.string,
+      email: PropTypes.string,
+      website: PropTypes.string,
+      clientName: PropTypes.string,
+      clientAddress: PropTypes.string,
+      payableName: PropTypes.string,
+      payableAddress: PropTypes.string,
+      items: PropTypes.arrayOf(
+        PropTypes.shape({
+          description: PropTypes.string,
+          quantity: PropTypes.number,
+          price: PropTypes.number,
+        })
+      ),
+      bankName: PropTypes.string,
+      routingNumber: PropTypes.string,
+      accountNumber: PropTypes.string,
+      terms: PropTypes.string,
+    }).isRequired,
+  };
 
   function formatPhoneNumber(phoneNumber) {
-    const cleaned = ("" + phoneNumber).replace(/\D/g, "");
+    const cleaned = ('' + phoneNumber).replace(/\D/g, '');
     if (cleaned.length !== 10) {
       return phoneNumber;
     }
@@ -26,6 +57,9 @@ function InvoicePreview({ invoiceData }) {
         backgroundColor: backgroundColor,
         fontFamily: fontFamily,
         color: textThemeColor,
+        width: '100%',
+        height: '100%',
+        aspectRatio: '0.707',
       }}
     >
       {invoiceData.logo && (
@@ -101,7 +135,7 @@ function InvoicePreview({ invoiceData }) {
           <p className="col-span-5 text-right">
             Total:
             <span style={{ color: textThemeColor }}>
-              {" "}
+              {' '}
               $
               {invoiceData.items.reduce(
                 (total, item) => total + item.quantity * item.price,
@@ -124,7 +158,7 @@ function InvoicePreview({ invoiceData }) {
         <h3 className="text-lg font-semibold mb-2">Terms & Conditions:</h3>
         <p>
           {invoiceData.terms ||
-            "Please send payment within 30 days of receiving this invoice."}
+            'Please send payment within 30 days of receiving this invoice.'}
         </p>
       </div>
     </div>

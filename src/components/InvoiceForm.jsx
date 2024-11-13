@@ -1,18 +1,49 @@
-import React, { useState, useEffect } from "react";
-import { FaPlus } from "react-icons/fa";
-import ItemInput from "./ItemInput";
+import { useState, useEffect } from 'react';
+import { FaPlus } from 'react-icons/fa';
+import ItemInput from './ItemInput';
+import PropTypes from 'prop-types';
 
 const inputStyle =
-  "w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-black dark:text-white";
+  'w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-black dark:text-white';
 
 function InvoiceForm({ invoiceData, setInvoiceData }) {
-  const [accountNumber, setAccountNumber] = useState("");
-  const [confirmAccountNumber, setConfirmAccountNumber] = useState("");
-  const [accountNumberError, setAccountNumberError] = useState("");
+  const [accountNumber, setAccountNumber] = useState('');
+  const [confirmAccountNumber, setConfirmAccountNumber] = useState('');
+  const [accountNumberError, setAccountNumberError] = useState('');
+
+  InvoiceForm.propTypes = {
+    invoiceData: PropTypes.shape({
+      invoiceDate: PropTypes.string,
+      items: PropTypes.arrayOf(
+        PropTypes.shape({
+          description: PropTypes.string,
+          quantity: PropTypes.number,
+          price: PropTypes.number,
+        })
+      ),
+      backgroundColor: PropTypes.string,
+      themeColor: PropTypes.string,
+      tableThemeColor: PropTypes.string,
+      textThemeColor: PropTypes.string,
+      font: PropTypes.string,
+      invoiceNumber: PropTypes.string,
+      clientName: PropTypes.string,
+      clientAddress: PropTypes.string,
+      payableName: PropTypes.string,
+      payableAddress: PropTypes.string,
+      bankName: PropTypes.string,
+      routingNumber: PropTypes.string,
+      terms: PropTypes.string,
+      email: PropTypes.string,
+      phone: PropTypes.string,
+      website: PropTypes.string,
+    }).isRequired,
+    setInvoiceData: PropTypes.func.isRequired,
+  };
 
   const getTodayDate = () => {
     const today = new Date();
-    return today.toISOString().split("T")[0]; // Formats date to YYYY-MM-DD
+    return today.toISOString().split('T')[0]; // Formats date to YYYY-MM-DD
   };
 
   // Prefill today's date if not already set
@@ -40,7 +71,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
   const addItem = () => {
     setInvoiceData({
       ...invoiceData,
-      items: [...invoiceData.items, { description: "", quantity: 1, price: 0 }],
+      items: [...invoiceData.items, { description: '', quantity: 1, price: 0 }],
     });
   };
 
@@ -63,31 +94,34 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
 
   const handleAccountNumberChange = (e) => {
     const { name, value } = e.target;
-    if (name === "accountNumber") {
+    if (name === 'accountNumber') {
       setAccountNumber(value);
-    } else if (name === "confirmAccountNumber") {
+    } else if (name === 'confirmAccountNumber') {
       setConfirmAccountNumber(value);
     }
   };
 
   const validateAccountNumbers = () => {
     if (accountNumber !== confirmAccountNumber) {
-      setAccountNumberError("Account numbers do not match.");
+      setAccountNumberError('Account numbers do not match.');
     } else {
-      setAccountNumberError("");
+      setAccountNumberError('');
       setInvoiceData({ ...invoiceData, accountNumber });
     }
   };
 
   return (
-    <div className="bg-gray-200 dark:bg-gray-700 p-6 rounded-md shadow-md w-full lg:w-1/2">
+    <div
+      style={{ width: '100%' }}
+      className="bg-gray-200 dark:bg-gray-700 p-6 rounded-md shadow-md w-full lg:w-1/2"
+    >
       <div className="grid grid-cols-5">
         <div>
           <h3 className="text-xl font-semibold mb-4">BgColor</h3>
           <input
             type="color"
             name="backgroundColor"
-            value={invoiceData.backgroundColor || "#E0E0E0"}
+            value={invoiceData.backgroundColor || '#E0E0E0'}
             onChange={handleChange}
             className="bg-transparent"
           />
@@ -97,7 +131,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
           <input
             type="color"
             name="themeColor"
-            value={invoiceData.themeColor || "#1A7DFF"}
+            value={invoiceData.themeColor || '#1A7DFF'}
             onChange={handleChange}
             className="bg-transparent"
           />
@@ -107,7 +141,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
           <input
             type="color"
             name="tableThemeColor"
-            value={invoiceData.tableThemeColor || "#D1D1D1"}
+            value={invoiceData.tableThemeColor || '#D1D1D1'}
             onChange={handleChange}
             className="bg-transparent"
           />
@@ -117,7 +151,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
           <input
             type="color"
             name="textThemeColor"
-            value={invoiceData.textThemeColor || "#000000"}
+            value={invoiceData.textThemeColor || '#000000'}
             onChange={handleChange}
             className="bg-transparent"
           />
@@ -126,7 +160,7 @@ function InvoiceForm({ invoiceData, setInvoiceData }) {
           <h3 className="text-xl font-semibold mb-4">Font Style</h3>
           <select
             name="font"
-            value={invoiceData.font || "sans-serif"}
+            value={invoiceData.font || 'sans-serif'}
             onChange={handleChange}
             className={`${inputStyle} w-full mb-4 p-2`}
           >

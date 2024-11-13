@@ -1,12 +1,21 @@
-const inputStyle =
-  "w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-black dark:text-white";
+import PropTypes from 'prop-types';
 
-export default function ItemInput({
-  item,
-  index,
-  handleItemChange,
-  deleteItem,
-}) {
+const inputStyle =
+  'w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-black dark:text-white';
+
+export default function ItemInput(props) {
+  const { item, index, handleItemChange, deleteItem } = props;
+  ItemInput.propTypes = {
+    item: PropTypes.shape({
+      description: PropTypes.string.isRequired,
+      quantity: PropTypes.number.isRequired,
+      price: PropTypes.number.isRequired,
+    }).isRequired,
+    index: PropTypes.number.isRequired,
+    handleItemChange: PropTypes.func.isRequired,
+    deleteItem: PropTypes.func.isRequired,
+  };
+
   return (
     <div key={index} className="mb-2">
       <label className="block">Item Description</label>
